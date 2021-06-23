@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
+import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
+
 @RestController
 public class AppController {
 	
@@ -23,6 +25,7 @@ public class AppController {
 	DiscoveryClient discoveryClient;
 	
 	@GetMapping("getEmp/{id}/{techId}")
+	@HystrixCommand(fallbackMethod = "recoveryMethod")
 	public ResponseEntity getEmployee(@PathVariable int id,@PathVariable int techId) {
 		
 		Employee emp=utility.getEmp(id);
@@ -39,6 +42,11 @@ public class AppController {
 		
 		return new ResponseEntity(emp,HttpStatus.OK);
 		
+	}
+	
+	public ResponseEntity recoveryMethod(@PathVariable int id,@PathVariable int techId) {
+		
+		return new ResponseEntity("Please try after some time",HttpStatus.OK);
 	}
 	
 
